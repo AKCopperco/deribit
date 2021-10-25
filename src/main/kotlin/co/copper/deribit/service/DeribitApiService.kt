@@ -7,10 +7,12 @@ import co.copper.deribit.dto.DeribitTransactionData
 import co.copper.deribit.exception.DeribitException
 import co.copper.deribit.extension.toTransaction
 import co.copper.deribit.extension.toUserBalance
+import co.copper.deribit.extension.toWithdrawResult
 import co.copper.deribit.model.Transaction
 import co.copper.deribit.model.TransactionType
 import co.copper.deribit.model.UserBalance
 import org.springframework.stereotype.Service
+import java.math.BigDecimal
 
 private const val TRANSACTION_COUNT_PER_REQUEST: Int = 10
 
@@ -48,6 +50,22 @@ class DeribitApiService(private val deribitApi: DeribitApi) {
 
         return mapOf(TransactionType.Deposit to deposits, TransactionType.Withdraw to withdrawals)
     }
+
+    @Throws(DeribitException::class)
+    fun withdraw(
+        clientId: String,
+        clientSecret: String,
+        currency: String,
+        amount: BigDecimal,
+        address: String,
+    ) = deribitApi.withdraw(
+        getBearerToken(clientId, clientSecret),
+        currency,
+        amount,
+        address
+    )
+        .result
+        .toWithdrawResult()
 
 
     private fun getBearerToken(clientId: String, clientSecret: String) =

@@ -2,6 +2,7 @@ package co.copper.deribit
 
 import co.copper.deribit.api.DeribitApplicationApi
 import co.copper.deribit.config.DeribitApplicationTestConfiguration
+import co.copper.deribit.dto.WithdrawRequest
 import co.copper.deribit.mock.DeribitApiMockDispatcher
 import co.copper.deribit.model.UserBalance
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase
@@ -141,6 +142,40 @@ class DeribitApplicationTests {
 
         assertFalse(balancesResponse.isSuccessful)
         assertEquals(400, balancesResponse.code())
+    }
+
+
+    @Test
+    fun `Withdraw to external address success`() {
+        val request = WithdrawRequest(
+            deribitClientId,
+            deribitClientSecret,
+            "BTC",
+            0.01.toBigDecimal(),
+            "2Mz9oJZ7MPD2Bhq2zXV6jMmKgc8JtXn9i7o"
+        )
+
+        val response = applicationApi.withdraw(request).execute()
+        val result = response.body()
+
+        assertTrue(response.isSuccessful)
+        assertNotNull(result)
+    }
+
+    @Test
+    fun `Withdraw - address not in address book returns BadRequest`() {
+        val request = WithdrawRequest(
+            deribitClientId,
+            deribitClientSecret,
+            "BTC",
+            0.01.toBigDecimal(),
+            "15xKGc8iuvRuz4ciKGs1zkHVLAjzkyLZE7"
+        )
+        val response = applicationApi.withdraw(request).execute()
+        val result = response.body()
+
+        assertFalse(response.isSuccessful)
+        assertEquals(400, response.code())
     }
 
 }

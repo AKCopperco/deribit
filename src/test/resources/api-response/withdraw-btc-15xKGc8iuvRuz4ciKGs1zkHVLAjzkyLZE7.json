@@ -1,0 +1,15 @@
+{
+  "jsonrpc": "2.0",
+  "error": {
+    "message": "Invalid params",
+    "data": {
+      "reason": "address not from address book",
+      "param": "address"
+    },
+    "code": -32602
+  },
+  "usIn": 1635101282532685,
+  "usOut": 1635101282532910,
+  "usDiff": 225,
+  "testnet": true
+}

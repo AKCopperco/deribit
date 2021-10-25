@@ -38,3 +38,23 @@ Expected results - json array with the following fields:
 * state: string. Allowed values - completed/pending/replaced/rejected
 * type: string. Allowed values - deposit/withdraw
 
+### Withdraw
+Withdraw address should be already in Deribit account address book. It is impossible to create it via api - method inside Internal api
+
+curl -X POST --location "http://localhost:8080/api/withdraw" -H "Content-Type: application/json" -d "{ \"clientId\": \"miom49HG\", \"clientSecret\": \"3nz4JfvojKwmcLHxn-aSdnyYRRin82X-ZCETTMIZfJU\", \"currency\": \"BTC\", \"amount\": 0.07, \"address\": \"2Mz9oJZ7MPD2Bhq2zXV6jMmKgc8JtXn9i7o\" }"
+
+Request payload:
+{
+  "cliendId": string,
+  "cliendSecret": string,
+  "currency": string,
+  "amount" : number,
+  "address": string
+}
+
+Expected result object with the following fields:
+* address: string
+* amount: number
+* currency: string
+* state: string
+

@@ -45,6 +45,13 @@ class DeribitApiMockDispatcher(
                     MockResponse().setResponseCode(200)
                         .setBody(TestHelper.apiResponseResourceAsText("get-withdrawals-${currency.lowercase()}-offset-${offset}-success.json"))
                 }
+                "/api/v2/private/withdraw" -> {
+                    val currency = requestUrl.queryParameter("currency")!!
+                    val address = requestUrl.queryParameter("address")!!
+
+                    MockResponse().setResponseCode(200)
+                        .setBody(TestHelper.apiResponseResourceAsText("withdraw-${currency.lowercase()}-${address}.json"))
+                }
                 else -> {
                     throw IllegalArgumentException("Unknown request")
                 }

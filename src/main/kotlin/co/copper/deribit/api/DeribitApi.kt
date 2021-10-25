@@ -5,6 +5,7 @@ import co.copper.deribit.exception.DeribitException
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Query
+import java.math.BigDecimal
 
 interface DeribitApi {
 
@@ -44,5 +45,14 @@ interface DeribitApi {
         @Query("count") count: Int,
         @Query("offset") offset: Int
     ): DeribitResponse<DeribitTransactionResult>
+
+    @Throws(DeribitException::class)
+    @GET("/api/v2/private/withdraw")
+    fun withdraw(
+        @Header("Authorization") authorization: String,
+        @Query("currency") currency: String,
+        @Query("amount") amount: BigDecimal,
+        @Query("address") address: String,
+    ): DeribitResponse<DeribitWithdrawResult>
 
 }

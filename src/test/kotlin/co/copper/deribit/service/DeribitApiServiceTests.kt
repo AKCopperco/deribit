@@ -3,9 +3,7 @@ package co.copper.deribit.service
 import co.copper.deribit.api.DeribitApi
 import co.copper.deribit.dto.*
 import co.copper.deribit.exception.DeribitException
-import co.copper.deribit.model.TransactionState
-import co.copper.deribit.model.TransactionType
-import co.copper.deribit.model.UserBalance
+import co.copper.deribit.model.*
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -16,9 +14,9 @@ import org.mockito.Mockito.`when`
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.*
 import org.mockito.stubbing.Answer
-import java.lang.Integer.min
 import java.math.BigDecimal
 import java.util.*
+import kotlin.math.min
 
 @ExtendWith(MockitoExtension::class)
 class DeribitApiServiceTests {
@@ -389,6 +387,53 @@ class DeribitApiServiceTests {
         verify(api, never()).getCurrencies()
         verify(api, never()).getWithdrawals(any(), any(), any(), any())
         verify(api, never()).getDeposits(any(), any(), any(), any())
+    }
+
+    @Test
+    fun `Withdraw throws exception if authorization is unsuccessful`() {
+        setupAuthMock()
+
+        assertThrows<DeribitException> {
+            deribitApiService.withdraw(
+                "invalid",
+                "invalid",
+                "BTC",
+                10.0.toBigDecimal(),
+                "SomeAddress"
+            )
+        }
+
+        verify(api, times(1)).auth(any(), any(), any())
+        verify(api, never()).getCurrencies()
+        verify(api, never()).withdraw(any(), any(), any(), any())
+    }
+
+    @Test
+    fun `Withdraw - success`() {
+        setupAuthMock()
+        val address = UUID.randomUUID().toString()
+        `when`(api.withdraw(any(), eq("BTC"), eq(15.0.toBigDecimal()), eq(address))).thenReturn(
+            deribitResponseSuccess(
+                DeribitWithdrawResult(
+                    address = address,
+                    amount = 15.0.toBigDecimal(),
+                    currency = "BTC",
+                    state = WithdrawalState.Completed
+                )
+            )
+        )
+
+        val result = deribitApiService.withdraw(validClientId, validClientSecret, "BTC", 15.0.toBigDecimal(), address)
+
+        assertNotNull(result)
+        assertEquals(address, result.address)
+        assertEquals(15.0.toBigDecimal(), result.amount)
+        assertEquals("BTC", result.currency)
+        assertEquals(WithdrawalState.Completed, result.state)
+
+        verify(api, times(1)).auth(any(), any(), any())
+        verify(api, never()).getCurrencies()
+        verify(api, times(1)).withdraw(any(), any(), any(), any())
     }
 
     private fun setupAuthMock() {

@@ -1,11 +1,10 @@
 package co.copper.deribit.controller
 
+import co.copper.deribit.dto.WithdrawRequest
 import co.copper.deribit.model.Transaction
 import co.copper.deribit.model.UserBalance
 import co.copper.deribit.service.DeribitService
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController
 class DeribitController(private val deribitService: DeribitService) {
@@ -25,5 +24,16 @@ class DeribitController(private val deribitService: DeribitService) {
     ): List<Transaction> {
         return deribitService.getTransactions(clientId, clientSecret)
     }
+
+    @PostMapping("/api/withdraw")
+    fun withdraw(
+        @RequestBody request: WithdrawRequest
+    ) = deribitService.withdraw(
+        request.clientId,
+        request.clientSecret,
+        request.currency,
+        request.amount,
+        request.address
+    )
 
 }
