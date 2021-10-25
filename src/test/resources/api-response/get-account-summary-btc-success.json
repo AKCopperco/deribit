@@ -1,0 +1,59 @@
+{
+  "jsonrpc": "2.0",
+  "result": {
+    "balance": 8.1,
+    "options_value": 0,
+    "maintenance_margin": 0,
+    "options_pl": 0,
+    "total_pl": 0,
+    "projected_maintenance_margin": 0,
+    "deposit_address": "2N2dcwyBX5bhkDk8LRkGgcpyp8JXjKMsEwR",
+    "available_funds": 8.1,
+    "options_delta": 0,
+    "futures_session_upl": 0,
+    "options_session_upl": 0,
+    "projected_initial_margin": 0,
+    "options_gamma": 0,
+    "referrer_id": null,
+    "limits": {
+      "non_matching_engine": {
+        "rate": 20,
+        "burst": 100
+      },
+      "matching_engine": {
+        "rate": 5,
+        "burst": 20
+      }
+    },
+    "equity": 8.1,
+    "estimated_liquidation_ratio_map": {},
+    "email": "jemeba3913@otozuz.com",
+    "system_name": "AKcopperco",
+    "id": 34347,
+    "interuser_transfers_enabled": false,
+    "type": "main",
+    "session_rpl": 0,
+    "delta_total": 0,
+    "options_vega": 0,
+    "projected_delta_total": 0,
+    "initial_margin": 0,
+    "available_withdrawal_funds": 8.1,
+    "delta_total_map": {},
+    "options_session_rpl": 0,
+    "session_upl": 0,
+    "username": "AKcopperco1",
+    "margin_balance": 8.1,
+    "options_theta": 0,
+    "estimated_liquidation_ratio": 0,
+    "futures_pl": 0,
+    "security_keys_enabled": false,
+    "currency": "BTC",
+    "creation_timestamp": 1634158802675,
+    "portfolio_margining_enabled": false,
+    "futures_session_rpl": 0
+  },
+  "usIn": 1634756202857640,
+  "usOut": 1634756202858361,
+  "usDiff": 721,
+  "testnet": true
+}

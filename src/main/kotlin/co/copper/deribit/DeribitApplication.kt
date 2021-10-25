@@ -7,5 +7,5 @@ import org.springframework.boot.runApplication
 class DeribitApplication
 
 fun main(args: Array<String>) {
-	runApplication<DeribitApplication>(*args)
+    runApplication<DeribitApplication>(*args)
 }
