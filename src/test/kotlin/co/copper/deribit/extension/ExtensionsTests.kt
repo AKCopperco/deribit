@@ -2,10 +2,9 @@ package co.copper.deribit.extension
 
 import co.copper.deribit.dto.DeribitAccountSummaryResult
 import co.copper.deribit.dto.DeribitTransactionData
+import co.copper.deribit.dto.DeribitTransferResult
 import co.copper.deribit.dto.DeribitWithdrawResult
-import co.copper.deribit.model.TransactionState
-import co.copper.deribit.model.TransactionType
-import co.copper.deribit.model.WithdrawalState
+import co.copper.deribit.model.*
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
@@ -77,6 +76,26 @@ class ExtensionsTests {
         assertEquals(value.currency, result.currency)
         assertEquals(value.state, result.state)
 
+    }
+
+    @Test
+    fun `DeribitTransferResult to TransferResult`() {
+        val value = DeribitTransferResult(
+            amount = 1.0.toBigDecimal(),
+            otherSide = "otherSide",
+            currency = "currency",
+            state = TransferState.Confirmed,
+            type = TransferType.SubAccount,
+            direction = "direction"
+        )
+
+        val result = value.toTransferResult()
+        assertEquals(value.amount, result.amount)
+        assertEquals(value.otherSide, result.otherSide)
+        assertEquals(value.currency, result.currency)
+        assertEquals(value.state, result.state)
+        assertEquals(value.type, result.type)
+        assertEquals(value.direction, result.direction)
     }
 
 }

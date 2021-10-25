@@ -1,5 +1,6 @@
 package co.copper.deribit.controller
 
+import co.copper.deribit.dto.TransferRequest
 import co.copper.deribit.dto.WithdrawRequest
 import co.copper.deribit.model.Transaction
 import co.copper.deribit.model.UserBalance
@@ -36,4 +37,14 @@ class DeribitController(private val deribitService: DeribitService) {
         request.address
     )
 
+    @PostMapping("/api/transfer-to-subaccount")
+    fun transferToSubAccount(
+        @RequestBody request: TransferRequest
+    ) = deribitService.transferToSubAccount(
+        request.clientId,
+        request.clientSecret,
+        request.currency,
+        request.amount,
+        request.username
+    )
 }

@@ -1,0 +1,45 @@
+{
+  "jsonrpc": "2.0",
+  "result": [
+    {
+      "username": "AKcopperco1",
+      "type": "main",
+      "system_name": "AKcopperco",
+      "security_keys_enabled": false,
+      "security_keys_assignments": [],
+      "receive_notifications": false,
+      "login_enabled": true,
+      "is_password": true,
+      "id": 34347,
+      "email": "jemeba3913@otozuz.com"
+    },
+    {
+      "username": "AKcopperco_1",
+      "type": "subaccount",
+      "system_name": "AKcopperco_1",
+      "security_keys_enabled": false,
+      "security_keys_assignments": [],
+      "receive_notifications": false,
+      "login_enabled": false,
+      "is_password": false,
+      "id": 34438,
+      "email": "jemeba3913@otozuz.com"
+    },
+    {
+      "username": "AKcopperco_4",
+      "type": "subaccount",
+      "system_name": "AKcopperco_4",
+      "security_keys_enabled": false,
+      "security_keys_assignments": [],
+      "receive_notifications": false,
+      "login_enabled": false,
+      "is_password": false,
+      "id": 34588,
+      "email": "jemeba3913@otozuz.com"
+    }
+  ],
+  "usIn": 1635104503420931,
+  "usOut": 1635104503421133,
+  "usDiff": 202,
+  "testnet": true
+}

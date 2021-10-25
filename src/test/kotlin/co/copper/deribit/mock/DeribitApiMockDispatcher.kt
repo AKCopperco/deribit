@@ -52,6 +52,17 @@ class DeribitApiMockDispatcher(
                     MockResponse().setResponseCode(200)
                         .setBody(TestHelper.apiResponseResourceAsText("withdraw-${currency.lowercase()}-${address}.json"))
                 }
+                "/api/v2/private/get_subaccounts" -> {
+                    MockResponse().setResponseCode(200)
+                        .setBody(TestHelper.apiResponseResourceAsText("get-subaccounts-success.json"))
+                }
+                "/api/v2/private/submit_transfer_to_subaccount" -> {
+                    val currency = requestUrl.queryParameter("currency")!!
+                    val destination = requestUrl.queryParameter("destination")!!
+
+                    MockResponse().setResponseCode(200)
+                        .setBody(TestHelper.apiResponseResourceAsText("submit_transfer_to_subaccount-${currency.lowercase()}-${destination}-success.json"))
+                }
                 else -> {
                     throw IllegalArgumentException("Unknown request")
                 }

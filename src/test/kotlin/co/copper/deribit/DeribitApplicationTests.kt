@@ -2,6 +2,7 @@ package co.copper.deribit
 
 import co.copper.deribit.api.DeribitApplicationApi
 import co.copper.deribit.config.DeribitApplicationTestConfiguration
+import co.copper.deribit.dto.TransferRequest
 import co.copper.deribit.dto.WithdrawRequest
 import co.copper.deribit.mock.DeribitApiMockDispatcher
 import co.copper.deribit.model.UserBalance
@@ -177,6 +178,41 @@ class DeribitApplicationTests {
         assertFalse(response.isSuccessful)
         assertEquals(400, response.code())
     }
+
+    @Test
+    fun `Transfer to sub account success `() {
+        val request = TransferRequest(
+            deribitClientId,
+            deribitClientSecret,
+            "BTC",
+            0.01.toBigDecimal(),
+            "AKcopperco_4"
+        )
+
+        val response = applicationApi.transferToSubAccount(request).execute()
+        val result = response.body()
+
+        assertTrue(response.isSuccessful)
+        assertNotNull(result)
+    }
+
+    @Test
+    fun `Transfer to sub account -  sub account doesn't exist - BadRequest`() {
+        val request = TransferRequest(
+            deribitClientId,
+            deribitClientSecret,
+            "BTC",
+            0.01.toBigDecimal(),
+            "Invalid"
+        )
+
+        val response = applicationApi.transferToSubAccount(request).execute()
+        val result = response.body()
+
+        assertFalse(response.isSuccessful)
+        assertEquals(400, response.code())
+    }
+
 
 }
 

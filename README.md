@@ -58,3 +58,24 @@ Expected result object with the following fields:
 * currency: string
 * state: string
 
+### Transfer to sub account 
+Transfer requested amount to a sub-account. Sub account is looked up by deribit subaccount alias (username).
+
+curl -X POST --location "http://localhost:8080/api/transfer-to-subaccount" -H "Content-Type: application/json" -d "{ \"clientId\": \"miom49HG\", \"clientSecret\": \"3nz4JfvojKwmcLHxn-aSdnyYRRin82X-ZCETTMIZfJU\", \"currency\": \"BTC\", \"amount\": 0.10, \"username\": \"AKcopperco_4\" }"
+
+Request payload:
+{
+"cliendId": string,
+"cliendSecret": string,
+"currency": string,
+"amount" : number,
+"username": string
+}
+
+Expected result object with the following fields:
+* amount: number,
+* otherSide: string,
+* currency: string,
+* state: tring,
+* type: tring,
+* direction: string

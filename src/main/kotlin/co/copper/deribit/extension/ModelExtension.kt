@@ -13,3 +13,4 @@ fun DeribitTransactionData.toTransaction(type: TransactionType) =
 
 fun DeribitWithdrawResult.toWithdrawResult() = WithdrawResult(address, amount, currency, state)
 
+fun DeribitTransferResult.toTransferResult() = TransferResult(amount, otherSide, currency, state, type, direction)

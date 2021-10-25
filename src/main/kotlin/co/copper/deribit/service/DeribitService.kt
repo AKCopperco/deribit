@@ -29,6 +29,15 @@ class DeribitService(
         address: String,
     ) = deribitApiService.withdraw(clientId, clientSecret, currency, amount, address)
 
+    fun transferToSubAccount(
+        clientId: String,
+        clientSecret: String,
+        currency: String,
+        amount: BigDecimal,
+        subAccountAlias: String
+    ) =
+        deribitApiService.transferToSubAccount(clientId, clientSecret, currency, amount, subAccountAlias)
+
     private fun storeBalance(balance: UserBalance) {
         if (userBalanceRepository.getUserBalance(balance.username, balance.currency) != balance) {
             userBalanceRepository.update(balance)

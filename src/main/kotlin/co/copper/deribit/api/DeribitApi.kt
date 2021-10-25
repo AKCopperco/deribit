@@ -55,4 +55,19 @@ interface DeribitApi {
         @Query("address") address: String,
     ): DeribitResponse<DeribitWithdrawResult>
 
+    @Throws(DeribitException::class)
+    @GET("/api/v2/private/submit_transfer_to_subaccount")
+    fun transferToSubAccount(
+        @Header("Authorization") authorization: String,
+        @Query("currency") currency: String,
+        @Query("amount") amount: BigDecimal,
+        @Query("destination") destination: Int
+    ): DeribitResponse<DeribitTransferResult>
+
+    @Throws(DeribitException::class)
+    @GET("/api/v2/private/get_subaccounts")
+    fun getSubAccounts(
+        @Header("Authorization") authorization: String,
+        @Query("with_portfolio") withPortfolio: Boolean = false,
+    ): DeribitResponse<List<DeribitSubAccountResult>>
 }

@@ -436,6 +436,85 @@ class DeribitApiServiceTests {
         verify(api, times(1)).withdraw(any(), any(), any(), any())
     }
 
+    @Test
+    fun `Transfer To SubAccount - SubAccount exists - success`() {
+        setupAuthMock()
+        setupGetSubAccountsMock()
+
+        `when`(api.transferToSubAccount(any(), any(), any(), any())).thenReturn(
+            deribitResponseSuccess(
+                DeribitTransferResult(
+                    amount = 10.0.toBigDecimal(),
+                    otherSide = "SubAccount1",
+                    currency = "BTC",
+                    state = TransferState.Confirmed,
+                    type = TransferType.SubAccount,
+                    direction = "direction"
+                )
+            )
+        )
+
+        val subAcountName = "SubAccount1"
+
+        val result = deribitApiService.transferToSubAccount(
+            validClientId,
+            validClientSecret,
+            "BTC",
+            10.0.toBigDecimal(),
+            subAcountName
+        )
+
+        assertNotNull(result)
+        assertEquals("BTC", result.currency)
+        assertEquals(10.0.toBigDecimal(), result.amount)
+        assertEquals(TransferState.Confirmed, result.state)
+        assertEquals(TransferType.SubAccount, result.type)
+        assertEquals("direction", result.direction)
+        assertEquals(subAcountName, result.otherSide)
+
+        verify(api, times(1)).auth(any(), any(), any())
+        verify(api, times(1)).getSubAccounts(any(), any())
+        verify(api, times(1)).transferToSubAccount(any(), any(), any(), any())
+    }
+
+    @Test
+    fun `Transfer To SubAccount - SubAccount doesn't exists - Exception thrown`() {
+        setupAuthMock()
+        setupGetSubAccountsMock()
+
+        val subAcountName = "SubAccount3"
+
+        assertThrows<DeribitException> {
+            val result = deribitApiService.transferToSubAccount(
+                validClientId,
+                validClientSecret,
+                "BTC",
+                10.0.toBigDecimal(),
+                subAcountName
+            )
+        }
+
+        verify(api, times(1)).auth(any(), any(), any())
+        verify(api, times(1)).getSubAccounts(any(), any())
+        verify(api, never()).transferToSubAccount(any(), any(), any(), any())
+    }
+
+    @Test
+    fun `Transfer To SubAccount throws exception if authorization is unsuccessful`() {
+        setupAuthMock()
+
+        assertThrows<DeribitException> {
+            deribitApiService.transferToSubAccount(
+                "invalid", "invalid",
+                "BTC", 10.0.toBigDecimal(), "Some SubAccount Name"
+            )
+        }
+
+        verify(api, times(1)).auth(any(), any(), any())
+        verify(api, never()).getCurrencies()
+        verify(api, never()).transferToSubAccount(any(), any(), any(), any())
+    }
+
     private fun setupAuthMock() {
         `when`(api.auth(any(), any(), any())).thenAnswer {
             val clientId = it.arguments[0] as String
@@ -510,6 +589,18 @@ class DeribitApiServiceTests {
 
             return@Answer deribitResponseSuccess(data)
         })
+    }
+
+    private fun setupGetSubAccountsMock() {
+        `when`(api.getSubAccounts(any(), any())).thenReturn(
+            deribitResponseSuccess(
+                listOf(
+                    DeribitSubAccountResult(username = "Main", id = 1),
+                    DeribitSubAccountResult(username = "SubAccount1", id = 2),
+                    DeribitSubAccountResult(username = "SubAccount2", id = 3),
+                )
+            )
+        )
     }
 
     private fun <T> deribitResponseSuccess(data: T): DeribitResponse<T> {

@@ -4,8 +4,10 @@ import co.copper.deribit.api.DeribitApi
 import co.copper.deribit.dto.DeribitAuthResult
 import co.copper.deribit.dto.DeribitCurrencyResult
 import co.copper.deribit.dto.DeribitTransactionData
+import co.copper.deribit.dto.TransferResult
 import co.copper.deribit.exception.DeribitException
 import co.copper.deribit.extension.toTransaction
+import co.copper.deribit.extension.toTransferResult
 import co.copper.deribit.extension.toUserBalance
 import co.copper.deribit.extension.toWithdrawResult
 import co.copper.deribit.model.Transaction
@@ -67,6 +69,24 @@ class DeribitApiService(private val deribitApi: DeribitApi) {
         .result
         .toWithdrawResult()
 
+    fun transferToSubAccount(
+        clientId: String,
+        clientSecret: String,
+        currency: String,
+        amount: BigDecimal,
+        subAccountAlias: String
+    ): TransferResult {
+        val token = getBearerToken(clientId, clientSecret)
+        val subAccount = deribitApi.getSubAccounts(token)
+            .result
+            .singleOrNull { e -> e.username == subAccountAlias }
+            ?: throw DeribitException(-1, "SubAccount does not exist")
+
+        return deribitApi.transferToSubAccount(token, currency, amount, subAccount.id)
+            .result
+            .toTransferResult()
+
+    }
 
     private fun getBearerToken(clientId: String, clientSecret: String) =
         "Bearer ".plus(auth(clientId, clientSecret).access_token)
