@@ -109,5 +109,39 @@ class DeribitApplicationTests {
         assertEquals(400, balancesResponse.code())
     }
 
+    @Test
+    fun `Get Transactions success`() {
+        val response = applicationApi.transactions(deribitClientId, deribitClientSecret).execute()
+        val transactions = response.body()
+
+        assertTrue(response.isSuccessful)
+        assertNotNull(transactions)
+        assertEquals(12, transactions!!.size)
+    }
+
+    @Test
+    fun `Get Transactions invalid client_secret returns BadRequest`() {
+        val balancesResponse = applicationApi.transactions(deribitClientId, "invalid").execute()
+
+        assertFalse(balancesResponse.isSuccessful)
+        assertEquals(400, balancesResponse.code())
+    }
+
+    @Test
+    fun `Get Transactions invalid client_id returns BadRequest`() {
+        val balancesResponse = applicationApi.transactions("invalid", deribitClientSecret).execute()
+
+        assertFalse(balancesResponse.isSuccessful)
+        assertEquals(400, balancesResponse.code())
+    }
+
+    @Test
+    fun `Get Transactions invalid client_id and client_secret returns BadRequest`() {
+        val balancesResponse = applicationApi.transactions("invalid", "invalid").execute()
+
+        assertFalse(balancesResponse.isSuccessful)
+        assertEquals(400, balancesResponse.code())
+    }
+
 }
 

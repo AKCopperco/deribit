@@ -33,6 +33,18 @@ class DeribitApiMockDispatcher(
                         MockResponse().setResponseCode(200)
                             .setBody(TestHelper.apiResponseResourceAsText("get-account-summary-${currency!!.lowercase()}-success.json"))
                     }
+                "/api/v2/private/get_deposits" -> {
+                    val currency = requestUrl.queryParameter("currency")!!
+                    val offset = requestUrl.queryParameter("offset")!!
+                    MockResponse().setResponseCode(200)
+                        .setBody(TestHelper.apiResponseResourceAsText("get-deposits-${currency.lowercase()}-offset-${offset}-success.json"))
+                }
+                "/api/v2/private/get_withdrawals" -> {
+                    val currency = requestUrl.queryParameter("currency")!!
+                    val offset = requestUrl.queryParameter("offset")!!
+                    MockResponse().setResponseCode(200)
+                        .setBody(TestHelper.apiResponseResourceAsText("get-withdrawals-${currency.lowercase()}-offset-${offset}-success.json"))
+                }
                 else -> {
                     throw IllegalArgumentException("Unknown request")
                 }

@@ -1,0 +1,11 @@
+{
+  "jsonrpc": "2.0",
+  "result": {
+    "data": [],
+    "count": 0
+  },
+  "usIn": 1634854216574362,
+  "usOut": 1634854216574657,
+  "usDiff": 295,
+  "testnet": true
+}

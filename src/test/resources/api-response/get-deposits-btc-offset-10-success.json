@@ -1,0 +1,22 @@
+{
+  "jsonrpc": "2.0",
+  "result": {
+    "data": [
+      {
+        "updated_timestamp": 1634173475040,
+        "transaction_id": "d7c2d9134e07ef5e9809309623fc11e7092ffb7787797f459acf0102d00fda6c",
+        "state": "completed",
+        "received_timestamp": 1634173429586,
+        "note": "",
+        "currency": "BTC",
+        "amount": 5,
+        "address": "2N2dcwyBX5bhkDk8LRkGgcpyp8JXjKMsEwR"
+      }
+    ],
+    "count": 11
+  },
+  "usIn": 1634854128963399,
+  "usOut": 1634854128963780,
+  "usDiff": 381,
+  "testnet": true
+}

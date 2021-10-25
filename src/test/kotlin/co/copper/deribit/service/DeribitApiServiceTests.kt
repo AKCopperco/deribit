@@ -1,14 +1,12 @@
 package co.copper.deribit.service
 
 import co.copper.deribit.api.DeribitApi
-import co.copper.deribit.dto.DeribitAccountSummaryResult
-import co.copper.deribit.dto.DeribitAuthResult
-import co.copper.deribit.dto.DeribitCurrencyResult
-import co.copper.deribit.dto.DeribitResponse
+import co.copper.deribit.dto.*
 import co.copper.deribit.exception.DeribitException
+import co.copper.deribit.model.TransactionState
+import co.copper.deribit.model.TransactionType
 import co.copper.deribit.model.UserBalance
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -18,6 +16,8 @@ import org.mockito.Mockito.`when`
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.*
 import org.mockito.stubbing.Answer
+import java.lang.Integer.min
+import java.math.BigDecimal
 import java.util.*
 
 @ExtendWith(MockitoExtension::class)
@@ -118,6 +118,279 @@ class DeribitApiServiceTests {
         verify(api, never()).getAccountSummary(any(), any())
     }
 
+    @Test
+    fun `Get Transactions - zero transactions - success`() {
+        val transactions: Map<TransactionType, Map<String, List<DeribitTransactionData>>> = emptyMap()
+
+        setupAuthMock()
+        setupCurrenciesMock()
+        setupWithdrawMock(transactions)
+        setupDepositMock(transactions)
+
+        val result = deribitApiService.getTransactions(validClientId, validClientSecret)
+
+        assertEquals(2, result.size)
+        assertTrue(result.containsKey(TransactionType.Deposit))
+        assertTrue(result.containsKey(TransactionType.Withdraw))
+
+        val deposits = result[TransactionType.Deposit]
+        assertNotNull(deposits)
+        assertEquals(0, deposits!!.size)
+
+        val withdrawals = result[TransactionType.Withdraw]
+        assertNotNull(withdrawals)
+        assertEquals(0, withdrawals!!.size)
+
+        verify(api, times(1)).auth(validClientId, validClientSecret)
+        verify(api, times(1)).auth(any(), any(), any())
+
+        verify(api, times(1)).getCurrencies()
+        verify(api, times(1)).getDeposits(any(), eq("BTC"), any(), any())
+        verify(api, times(1)).getDeposits(any(), eq("ETH"), any(), any())
+        verify(api, times(1)).getDeposits(any(), eq("USDT"), any(), any())
+        verify(api, times(3)).getDeposits(any(), any(), any(), any())
+
+        verify(api, times(1)).getWithdrawals(any(), eq("BTC"), any(), any())
+        verify(api, times(1)).getWithdrawals(any(), eq("ETH"), any(), any())
+        verify(api, times(1)).getWithdrawals(any(), eq("USDT"), any(), any())
+        verify(api, times(3)).getWithdrawals(any(), any(), any(), any())
+
+    }
+
+    @Test
+    fun `Get Transactions - one deposit transaction - success`() {
+        val transactions = mapOf(
+            TransactionType.Deposit to mapOf(
+                "BTC" to deribitTransactions("BTC", 1)
+            )
+        )
+
+        setupAuthMock()
+        setupCurrenciesMock()
+        setupWithdrawMock(transactions)
+        setupDepositMock(transactions)
+
+
+        val result = deribitApiService.getTransactions(validClientId, validClientSecret)
+
+        assertEquals(2, result.size)
+        assertTrue(result.containsKey(TransactionType.Deposit))
+        assertTrue(result.containsKey(TransactionType.Withdraw))
+
+        val deposits = result[TransactionType.Deposit]
+        assertNotNull(deposits)
+        assertEquals(1, deposits!!.size)
+
+        val withdrawals = result[TransactionType.Withdraw]
+        assertNotNull(withdrawals)
+        assertEquals(0, withdrawals!!.size)
+
+        verify(api, times(1)).auth(validClientId, validClientSecret)
+        verify(api, times(1)).auth(any(), any(), any())
+
+        verify(api, times(1)).getCurrencies()
+        verify(api, times(1)).getDeposits(any(), eq("BTC"), any(), any())
+        verify(api, times(1)).getDeposits(any(), eq("ETH"), any(), any())
+        verify(api, times(1)).getDeposits(any(), eq("USDT"), any(), any())
+        verify(api, times(3)).getDeposits(any(), any(), any(), any())
+
+        verify(api, times(1)).getWithdrawals(any(), eq("BTC"), any(), any())
+        verify(api, times(1)).getWithdrawals(any(), eq("ETH"), any(), any())
+        verify(api, times(1)).getWithdrawals(any(), eq("USDT"), any(), any())
+        verify(api, times(3)).getWithdrawals(any(), any(), any(), any())
+
+    }
+
+    @Test
+    fun `Get Transactions - one withdraw transaction - success`() {
+        val transactions = mapOf(
+            TransactionType.Withdraw to mapOf(
+                "BTC" to deribitTransactions("BTC", 1)
+            )
+        )
+
+        setupAuthMock()
+        setupCurrenciesMock()
+        setupWithdrawMock(transactions)
+        setupDepositMock(transactions)
+
+        val result = deribitApiService.getTransactions(validClientId, validClientSecret)
+
+        assertEquals(2, result.size)
+        assertTrue(result.containsKey(TransactionType.Deposit))
+        assertTrue(result.containsKey(TransactionType.Withdraw))
+
+        val deposits = result[TransactionType.Deposit]
+        assertNotNull(deposits)
+        assertEquals(0, deposits!!.size)
+
+        val withdrawals = result[TransactionType.Withdraw]
+        assertNotNull(withdrawals)
+        assertEquals(1, withdrawals!!.size)
+
+        verify(api, times(1)).auth(validClientId, validClientSecret)
+        verify(api, times(1)).auth(any(), any(), any())
+
+        verify(api, times(1)).getCurrencies()
+        verify(api, times(1)).getDeposits(any(), eq("BTC"), any(), any())
+        verify(api, times(1)).getDeposits(any(), eq("ETH"), any(), any())
+        verify(api, times(1)).getDeposits(any(), eq("USDT"), any(), any())
+        verify(api, times(3)).getDeposits(any(), any(), any(), any())
+
+        verify(api, times(1)).getWithdrawals(any(), eq("BTC"), any(), any())
+        verify(api, times(1)).getWithdrawals(any(), eq("ETH"), any(), any())
+        verify(api, times(1)).getWithdrawals(any(), eq("USDT"), any(), any())
+        verify(api, times(3)).getWithdrawals(any(), any(), any(), any())
+
+    }
+
+    @Test
+    fun `Get Transactions - many deposit transactions - success`() {
+
+        val transactions = mapOf(
+            TransactionType.Deposit to mapOf(
+                "BTC" to deribitTransactions("BTC", 1555)
+            )
+        )
+
+        setupAuthMock()
+        setupCurrenciesMock()
+        setupWithdrawMock(transactions)
+        setupDepositMock(transactions)
+
+        val result = deribitApiService.getTransactions(validClientId, validClientSecret)
+
+        assertEquals(2, result.size)
+        assertTrue(result.containsKey(TransactionType.Deposit))
+        assertTrue(result.containsKey(TransactionType.Withdraw))
+
+        val deposits = result[TransactionType.Deposit]
+        assertNotNull(deposits)
+        assertEquals(1555, deposits!!.size)
+
+        val withdrawals = result[TransactionType.Withdraw]
+        assertNotNull(withdrawals)
+        assertEquals(0, withdrawals!!.size)
+
+        verify(api, times(1)).auth(validClientId, validClientSecret)
+        verify(api, times(1)).auth(any(), any(), any())
+
+        verify(api, times(1)).getCurrencies()
+        verify(api, times(156)).getDeposits(any(), eq("BTC"), any(), any())
+        verify(api, times(1)).getDeposits(any(), eq("ETH"), any(), any())
+        verify(api, times(1)).getDeposits(any(), eq("USDT"), any(), any())
+        verify(api, times(158)).getDeposits(any(), any(), any(), any())
+
+        verify(api, times(1)).getWithdrawals(any(), eq("BTC"), any(), any())
+        verify(api, times(1)).getWithdrawals(any(), eq("ETH"), any(), any())
+        verify(api, times(1)).getWithdrawals(any(), eq("USDT"), any(), any())
+        verify(api, times(3)).getWithdrawals(any(), any(), any(), any())
+
+    }
+
+    @Test
+    fun `Get Transactions - many withdraw transactions - success`() {
+
+        val transactions = mapOf(
+            TransactionType.Withdraw to mapOf(
+                "BTC" to deribitTransactions("BTC", 2159)
+            )
+        )
+
+        setupAuthMock()
+        setupCurrenciesMock()
+        setupWithdrawMock(transactions)
+        setupDepositMock(transactions)
+
+        val result = deribitApiService.getTransactions(validClientId, validClientSecret)
+
+        assertEquals(2, result.size)
+        assertTrue(result.containsKey(TransactionType.Deposit))
+        assertTrue(result.containsKey(TransactionType.Withdraw))
+
+        val deposits = result[TransactionType.Deposit]
+        assertNotNull(deposits)
+        assertEquals(0, deposits!!.size)
+
+        val withdrawals = result[TransactionType.Withdraw]
+        assertNotNull(withdrawals)
+        assertEquals(2159, withdrawals!!.size)
+
+        verify(api, times(1)).auth(validClientId, validClientSecret)
+        verify(api, times(1)).auth(any(), any(), any())
+
+        verify(api, times(1)).getCurrencies()
+        verify(api, times(1)).getDeposits(any(), eq("BTC"), any(), any())
+        verify(api, times(1)).getDeposits(any(), eq("ETH"), any(), any())
+        verify(api, times(1)).getDeposits(any(), eq("USDT"), any(), any())
+        verify(api, times(3)).getDeposits(any(), any(), any(), any())
+
+        verify(api, times(216)).getWithdrawals(any(), eq("BTC"), any(), any())
+        verify(api, times(1)).getWithdrawals(any(), eq("ETH"), any(), any())
+        verify(api, times(1)).getWithdrawals(any(), eq("USDT"), any(), any())
+        verify(api, times(218)).getWithdrawals(any(), any(), any(), any())
+
+    }
+
+    @Test
+    fun `Get Transactions - many withdraw and many deposit transactions - success`() {
+
+        val transactions = mapOf(
+            TransactionType.Deposit to mapOf(
+                "BTC" to deribitTransactions("BTC", 4213)
+            ),
+            TransactionType.Withdraw to mapOf(
+                "BTC" to deribitTransactions("BTC", 9424)
+            ),
+        )
+
+        setupAuthMock()
+        setupCurrenciesMock()
+        setupWithdrawMock(transactions)
+        setupDepositMock(transactions)
+
+        val result = deribitApiService.getTransactions(validClientId, validClientSecret)
+
+        assertEquals(2, result.size)
+        assertTrue(result.containsKey(TransactionType.Deposit))
+        assertTrue(result.containsKey(TransactionType.Withdraw))
+
+        val deposits = result[TransactionType.Deposit]
+        assertNotNull(deposits)
+        assertEquals(4213, deposits!!.size)
+
+        val withdrawals = result[TransactionType.Withdraw]
+        assertNotNull(withdrawals)
+        assertEquals(9424, withdrawals!!.size)
+
+        verify(api, times(1)).auth(validClientId, validClientSecret)
+        verify(api, times(1)).auth(any(), any(), any())
+
+        verify(api, times(1)).getCurrencies()
+        verify(api, times(422)).getDeposits(any(), eq("BTC"), any(), any())
+        verify(api, times(1)).getDeposits(any(), eq("ETH"), any(), any())
+        verify(api, times(1)).getDeposits(any(), eq("USDT"), any(), any())
+        verify(api, times(424)).getDeposits(any(), any(), any(), any())
+
+        verify(api, times(943)).getWithdrawals(any(), eq("BTC"), any(), any())
+        verify(api, times(1)).getWithdrawals(any(), eq("ETH"), any(), any())
+        verify(api, times(1)).getWithdrawals(any(), eq("USDT"), any(), any())
+        verify(api, times(945)).getWithdrawals(any(), any(), any(), any())
+
+    }
+
+    @Test
+    fun `Get Transactions throws exception if authorization is unsuccessful`() {
+        setupAuthMock()
+
+        assertThrows<DeribitException> { deribitApiService.getTransactions("invalid", "invalid") }
+
+        verify(api, times(1)).auth(any(), any(), any())
+        verify(api, never()).getCurrencies()
+        verify(api, never()).getWithdrawals(any(), any(), any(), any())
+        verify(api, never()).getDeposits(any(), any(), any(), any())
+    }
+
     private fun setupAuthMock() {
         `when`(api.auth(any(), any(), any())).thenAnswer {
             val clientId = it.arguments[0] as String
@@ -144,6 +417,44 @@ class DeribitApiServiceTests {
         )
     }
 
+    private fun setupWithdrawMock(transactions: Map<TransactionType, Map<String, List<DeribitTransactionData>>>) {
+        `when`(
+            api.getWithdrawals(any(), any(), any(), any())
+        ).thenAnswer(Answer {
+            val currency = it.arguments[1] as String
+            val count = it.arguments[2] as Int
+            val offset = it.arguments[3] as Int
+            val transactionDataList =
+                transactions.getOrDefault(TransactionType.Withdraw, emptyMap()).getOrDefault(currency, emptyList())
+
+            return@Answer deribitResponseSuccess(
+                DeribitTransactionResult(
+                    count = transactionDataList.size,
+                    data = transactionDataList.subList(offset, min(transactionDataList.size, offset + count))
+                )
+            )
+        })
+    }
+
+    private fun setupDepositMock(transactions: Map<TransactionType, Map<String, List<DeribitTransactionData>>>) {
+        `when`(
+            api.getDeposits(any(), any(), any(), any())
+        ).thenAnswer(Answer {
+            val currency = it.arguments[1] as String
+            val count = it.arguments[2] as Int
+            val offset = it.arguments[3] as Int
+            val transactionDataList =
+                transactions.getOrDefault(TransactionType.Deposit, emptyMap()).getOrDefault(currency, emptyList())
+
+            return@Answer deribitResponseSuccess(
+                DeribitTransactionResult(
+                    count = transactionDataList.size,
+                    data = transactionDataList.subList(offset, min(transactionDataList.size, offset + count))
+                )
+            )
+        })
+    }
+
     private fun setupAccountSummaryMock(accountSummaryMap: Map<String, DeribitAccountSummaryResult>) {
         `when`(
             api.getAccountSummary(any(), any())
@@ -160,4 +471,15 @@ class DeribitApiServiceTests {
         return DeribitResponse<T>(0, "2.0", data, null)
     }
 
+    private fun deribitTransactions(currency: String, count: Int): List<DeribitTransactionData> {
+        return IntArray(count)
+            .map {
+                DeribitTransactionData(
+                    address = UUID.randomUUID().toString(),
+                    amount = BigDecimal.valueOf(0.1 * it),
+                    currency = currency,
+                    state = TransactionState.Pending,
+                )
+            }
+    }
 }

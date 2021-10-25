@@ -23,3 +23,18 @@ Expected results - json array with the following fields:
 * currency: string 
 * balance: number
 * reserved: number
+
+### Get Transactions
+curl -X GET "http://localhost:8080/api/transactions?client_id=miom49HG&client_secret=3nz4JfvojKwmcLHxn-aSdnyYRRin82X-ZCETTMIZfJU" -H "Content-Type: application/json"
+
+Where:
+* cliend_id: Deribit api key
+* cliend_secret: Deribit api secret
+
+Expected results - json array with the following fields:
+* address: string
+* amount: number
+* currency: string
+* state: string. Allowed values - completed/pending/replaced/rejected
+* type: string. Allowed values - deposit/withdraw
+

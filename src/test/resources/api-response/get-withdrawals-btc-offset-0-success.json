@@ -1,0 +1,26 @@
+{
+  "jsonrpc": "2.0",
+  "result": {
+    "data": [
+      {
+        "updated_timestamp": 1634480868747,
+        "transaction_id": null,
+        "state": "rejected",
+        "priority": 1.5,
+        "note": "",
+        "id": 16657,
+        "fee": 0.0002,
+        "currency": "BTC",
+        "created_timestamp": 1634477238802,
+        "confirmed_timestamp": null,
+        "amount": 0.01,
+        "address": "2Mz9oJZ7MPD2Bhq2zXV6jMmKgc8JtXn9i7o"
+      }
+    ],
+    "count": 1
+  },
+  "usIn": 1634854274227794,
+  "usOut": 1634854274228143,
+  "usDiff": 349,
+  "testnet": true
+}

@@ -1,5 +1,8 @@
 package co.copper.deribit.service
 
+import co.copper.deribit.model.Transaction
+import co.copper.deribit.model.TransactionState
+import co.copper.deribit.model.TransactionType
 import co.copper.deribit.model.UserBalance
 import co.copper.deribit.storage.BalanceRepository
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -191,6 +194,110 @@ class DeribitServiceTests {
 
         verify(repository, times(2)).getUserBalance(any(), any())
         verify(repository, times(1)).update(any())
+    }
+
+    @Test
+    fun `Get Transactions success`() {
+        `when`(apiService.getTransactions(clientId, clientSecret)).thenReturn(mockTransactions())
+
+        assertDoesNotThrow { service.getTransactions(clientId, clientSecret) }
+    }
+
+    @Test
+    fun `Get Transactions - api service get called`() {
+        service.getTransactions(clientId, clientSecret)
+
+        verify(apiService, times(1)).getTransactions(clientId, clientSecret)
+    }
+
+    @Test
+    fun `Get Transactions - no transactions - correct values are returned`() {
+        val emptyTransactions = mapOf<TransactionType, List<Transaction>>(
+            TransactionType.Withdraw to emptyList(),
+            TransactionType.Deposit to emptyList(),
+        )
+        `when`(apiService.getTransactions(clientId, clientSecret)).thenReturn(emptyTransactions)
+
+        val result = service.getTransactions(clientId, clientSecret)
+
+        assertEquals(0, result.size)
+    }
+
+    @Test
+    fun `Get Transactions - some transactions - correct values are returned`() {
+        `when`(apiService.getTransactions(clientId, clientSecret)).thenReturn(mockTransactions())
+
+        val result = service.getTransactions(clientId, clientSecret)
+
+        assertEquals(5, result.size)
+        assertEquals(3, result.filter { e -> e.type == TransactionType.Deposit }.size)
+        assertEquals(2, result.filter { e -> e.type == TransactionType.Withdraw }.size)
+    }
+
+    @Test
+    fun `Get Transactions - rejected transaction is returned if rejected`() {
+        `when`(apiService.getTransactions(clientId, clientSecret)).thenReturn(
+            mapOf(
+                TransactionType.Deposit to listOf(
+                    Transaction(
+                        address = "Some Address 1",
+                        amount = 10.0.toBigDecimal(),
+                        currency = "BTC",
+                        state = TransactionState.Rejected,
+                        TransactionType.Deposit
+                    )
+                )
+            )
+        )
+
+        val result = service.getTransactions(clientId, clientSecret)
+
+        assertEquals(1, result.size)
+        assertEquals(TransactionState.Rejected, result[0].state)
+    }
+
+    private fun mockTransactions(): Map<TransactionType, List<Transaction>> {
+        return mapOf(
+            TransactionType.Deposit to listOf(
+                Transaction(
+                    address = "Some Address 1",
+                    amount = 10.0.toBigDecimal(),
+                    currency = "BTC",
+                    state = TransactionState.Completed,
+                    type = TransactionType.Deposit
+                ),
+                Transaction(
+                    address = "Some Address 1",
+                    amount = 20.0.toBigDecimal(),
+                    currency = "BTC",
+                    state = TransactionState.Pending,
+                    type = TransactionType.Deposit
+                ),
+                Transaction(
+                    address = "Some Address 2",
+                    amount = 30.0.toBigDecimal(),
+                    currency = "ETC",
+                    state = TransactionState.Completed,
+                    type = TransactionType.Deposit
+                ),
+            ),
+            TransactionType.Withdraw to listOf(
+                Transaction(
+                    address = "Some Address 3",
+                    amount = 40.0.toBigDecimal(),
+                    currency = "ETC",
+                    state = TransactionState.Completed,
+                    type = TransactionType.Withdraw
+                ),
+                Transaction(
+                    address = "Some Address 4",
+                    amount = 50.0.toBigDecimal(),
+                    currency = "USDT",
+                    state = TransactionState.Rejected,
+                    type = TransactionType.Withdraw
+                )
+            )
+        )
     }
 
     private fun mockAccountSummary(): List<UserBalance> {
