@@ -10,6 +10,9 @@
 ## Run application
 ./gradlew bootRun
 
+## To run in container mode
+./gradlew build && docker-compose build && docker-compose up
+
 ## Methods
 ### Get Balances
 curl -X GET "http://localhost:8080/api/balances?client_id=miom49HG&client_secret=3nz4JfvojKwmcLHxn-aSdnyYRRin82X-ZCETTMIZfJU" -H "Content-Type: application/json"
